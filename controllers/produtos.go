@@ -53,6 +53,33 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 // Edit é a função que renderiza a página de edição de produtos
 func Edit(w http.ResponseWriter, r *http.Request) {
 	idProduto := r.URL.Query().Get("id")
-	produto := models.EditaProduto(idProduto)
+	produto := models.GetProduto(idProduto)
 	temp.ExecuteTemplate(w, "edit.html", produto)
+}
+
+// Update é a função que atualiza um produto no banco de dados
+func Update(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		id := r.FormValue("id")
+		nome := r.FormValue("nome")
+		descricao := r.FormValue("descricao")
+		p := r.FormValue("preco")
+		q := r.FormValue("quantidade")
+
+		idProduto, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err.Error())
+		}
+		preco, err := strconv.ParseFloat(p, 64)
+		if err != nil {
+			panic(err.Error())
+		}
+		quantidade, err := strconv.Atoi(q)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		models.UpdateProduto(idProduto, nome, descricao, preco, quantidade)
+	}
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }

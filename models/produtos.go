@@ -14,6 +14,35 @@ type Produto struct {
 	Quantidade int
 }
 
+// GetProduto é uma função que retorna um produto do banco de dados
+func GetProduto(id string) Produto {
+	db := db.ConnectDB()
+	selectProduto, err := db.Query("select * from public.produtos where id=$1", id)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	produto := Produto{}
+	for selectProduto.Next() {
+		var id, quantidade int
+		var nome, descricao string
+		var preco float64
+
+		err = selectProduto.Scan(&id, &nome, &descricao, &preco, &quantidade)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		produto.ID = id
+		produto.Nome = nome
+		produto.Descricao = descricao
+		produto.Preco = preco
+		produto.Quantidade = quantidade
+	}
+	defer db.Close()
+	return produto
+}
+
 // CriaProduto é uma função que insere um novo produto no banco de dados
 func CriaProduto(nome, descricao string, preco float64, quantidade int) {
 	db := db.ConnectDB()
@@ -36,33 +65,16 @@ func DeletaProduto(id string) {
 	defer db.Close()
 }
 
-// EditaProduto é uma função que edita um produto do banco de dados
-func EditaProduto(id string) Produto {
+// UpdateProduto é uma função que atualiza um produto no banco de dados
+func UpdateProduto(id int, nome string, descricao string, preco float64, quantidade int) {
 	db := db.ConnectDB()
-	produtoDoBanco, err := db.Query("select * from public.produtos where id=$1")
+	updateProduto, err := db.Prepare("update public.produtos set nome=$1, descricao=$2, preco=$3, quantidade=$4 where id=$5")
 	if err != nil {
 		panic(err.Error())
 	}
 
-	produtoParaEditar := Produto{}
-	for produtoDoBanco.Next() {
-		var id, quantidade int
-		var nome, descricao string
-		var preco float64
-
-		err = produtoDoBanco.Scan(&id, &nome, &descricao, &preco, &quantidade)
-		if err != nil {
-			panic(err.Error())
-		}
-		produtoParaEditar.ID = id
-		produtoParaEditar.Nome = nome
-		produtoParaEditar.Descricao = descricao
-		produtoParaEditar.Preco = preco
-		produtoParaEditar.Quantidade = quantidade
-
-	}
+	updateProduto.Exec(nome, descricao, preco, quantidade, id)
 	defer db.Close()
-	return produtoParaEditar
 }
 
 func RetornaProdutos() []Produto {
