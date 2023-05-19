@@ -14,3 +14,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	produtos := models.RetornaProdutos()
 	temp.ExecuteTemplate(w, "index.html", produtos)
 }
+
+// New é a função que renderiza a página de cadastro de produtos
+func New(w http.ResponseWriter, r *http.Request) {
+	temp.ExecuteTemplate(w, "new.html", nil)
+}
