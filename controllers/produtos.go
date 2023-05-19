@@ -7,7 +7,7 @@ import (
 	"github.com/fpcoutinho/loja/models"
 )
 
-var temp = template.Must(template.ParseGlob("templates/*.html"))
+var temp = template.Must(template.ParseGlob("views/*.html"))
 
 // Index é a função que renderiza a página inicial
 func Index(w http.ResponseWriter, r *http.Request) {
