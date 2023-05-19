@@ -2,9 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -58,7 +61,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 // Função que conecta ao banco de dados
 func connectDB() *sql.DB {
-	conexao := "user=postgres dbname=alura-loja password=fpc050696 host=localhost sslmode=disable"
+	err := godotenv.Load()
+	if err != nil {
+		panic(err.Error())
+	}
+	conexao := fmt.Sprintf(`user=%s dbname=%s password=%s host=localhost sslmode=disable`, os.Getenv("DB_USR"), os.Getenv("DB_NAME"), os.Getenv("DB_PWD"))
+
 	db, err := sql.Open("postgres", conexao)
 	if err != nil {
 		panic(err.Error())
