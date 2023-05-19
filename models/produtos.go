@@ -13,6 +13,17 @@ type Produto struct {
 	Quantidade int
 }
 
+// CriaProduto é uma função que insere um novo produto no banco de dados
+func CriaProduto(nome, descricao string, preco float64, quantidade int) {
+	db := db.ConnectDB()
+	insertProduto, err := db.Prepare("insert into public.produtos(nome, descricao, preco, quantidade) values($1, $2, $3, $4)")
+	if err != nil {
+		panic(err.Error())
+	}
+	insertProduto.Exec(nome, descricao, preco, quantidade)
+	defer db.Close()
+}
+
 func RetornaProdutos() []Produto {
 	db := db.ConnectDB()
 	selectProdutos, err := db.Query("select * from public.produtos")
